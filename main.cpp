@@ -25,6 +25,7 @@ void keyUp (unsigned char key, int x, int y) {
 }
 
 void init (void) {
+  glShadeModel(GL_SMOOTH);
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
   glEnable (GL_LIGHT0);
@@ -32,7 +33,7 @@ void init (void) {
 
 int main(int argc, char** argv) {
   glutInit(&argc, argv); // Initialize GLUT
-  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize (800, 600); // Set the width and height of the window  
   glutInitWindowPosition (100, 100); // Set the position of the window  
   glutCreateWindow ("GKOM - Space Invaders"); // Set the title for the window
@@ -50,5 +51,16 @@ int main(int argc, char** argv) {
   glutIdleFunc(glutPostRedisplay);//Zmienić!
   
   glutMainLoop(); // Enter GLUT's main loop  
+
+  // /** TESTY **/
+
+  // View::Vector vector1 (2,3,4);
+  // View::Vector vector2 (5,6,7);
+  // //  vector1.normalize();
+  // View::Vector c = View::Vector::cross(vector1, vector2);
+
+  // c = c * -1;
+  
+  // std::cout << c.x << " " << c.y << " " << c.z << std::endl;
   
 }
