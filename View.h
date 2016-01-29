@@ -9,12 +9,41 @@
 
 class View {
 
-private:
-  bool keysPressed[255];
+  class Camera {
+  
+    float xAngle;
+    float yAngle;
+    float radius;
+    //Wspolrzedne punktu na ktory kamera patrzy
+    float x;
+    float z;
 
-  //Test
-  float yAngle;
-  float zAngle;
+    const float STEP = 1;
+
+  public:
+    Camera(void): xAngle(66), yAngle(0), radius(166), x(0), z(-80) {}
+    float getXAngle() {return xAngle;}
+    float getYAngle() {return yAngle;}
+    float getX() {return x;}
+    float getZ() {return z;}
+    float getRadius() {return radius;}
+    void moveRight() {yAngle-=STEP;}
+    void moveLeft() {yAngle+=STEP;}
+    void moveUp() {xAngle+=STEP;}
+    void moveDown() {xAngle-=STEP;}
+    void zoomIn() {radius -=STEP; if(radius<0) radius=0;}
+    void zoomOut() {radius +=STEP;}
+  };
+
+  
+private:
+  //Model
+  Model model;
+  
+  //Kamera
+  Camera camera;
+  
+  bool keysPressed[255];
 
   static const int PlayerShipVertNb;
   static const int PlayerShipIndNb;
@@ -23,22 +52,27 @@ private:
   GLfloat *PlayerShipNormals;
   static const GLfloat PlayerShipColors[];
   static const GLfloat EnemyShipColors[];
+
+  //Konwersja ze wspolrzednych modelu
+  float xToViewX(float  x) {return 3.0*x;}
+  float yToViewZ(float  y) {return -3.0*y;}
   
   
   //Rysuje statek
-  void drawShip(const Ship &ship);
+  void drawShip(Ship &ship);
+
+  //Rysuje model
+  void drawModel();
 
   //timer
   boost::timer timer;
   static const int FPS = 60;
 
-
+  //Liczenie normalnych
+  class Vector;
+  static GLfloat* getNormals(const GLfloat *vert, const GLubyte *ind, int v, int f);
   
 public:
-  class Vector;
-
-  static GLfloat* getNormals(const GLfloat *vert, const GLubyte *ind, int v, int f);
-
   // GLUT callbacks
 
   //rysowanie
@@ -58,7 +92,6 @@ public:
 
   View() {
     for(int i=0; i<256; i++) keysPressed[i]=false;
-    zAngle = yAngle = 0;
 
     PlayerShipNormals = getNormals(PlayerShipVertices,
 					 PlayerShipIndices,
@@ -67,6 +100,8 @@ public:
   }
   
 };
+
+
 
 
 class View::Vector {

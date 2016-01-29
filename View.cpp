@@ -6,25 +6,24 @@ void View::display() {
 
   keysUpdate();
 
-  //  glClearColor (0.0,0.0,0.0,1.0);
+  
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  
   glLoadIdentity(); // Load the Identity Matrix to reset our drawing locations
 
   glPushMatrix();
-  glTranslatef(0.0f, 0.0f, -20.0f);
-  glRotatef(zAngle, 1.0f, 0.0f, 0.0f);
-  glRotatef(yAngle, 0.0f, 1.0f, 0.0f);
+  glTranslatef(0.0f, 0.0f, -camera.getRadius());
+  glRotatef(camera.getXAngle(), 1.0f, 0.0f, 0.0f);
+  glRotatef(camera.getYAngle(), 0.0f, 1.0f, 0.0f);
+  glTranslatef(camera.getX(), 0, -camera.getZ());
 
-   Ship ship;
+  // Ship ship1(-2,60,Ship::Type::ENEMY);
+  // Ship ship2(2,60,Ship::Type::ENEMY);
+  // Ship ship3(0,0,Ship::Type::PLAYER);
+  // drawShip(ship1);
+  // drawShip(ship2);
+  // drawShip(ship3);
 
-   drawShip(ship);
-
-  // glutSolidTeapot(5.0);
-  
-
-  
+  drawModel();
   glPopMatrix();
   
   glFlush(); // Flush the OpenGL buffers to the window
@@ -36,19 +35,17 @@ void View::idle() {
     timer.restart();
     display();
     keysUpdate();
+    model.step();
+    // std::cout << camera.getXAngle() << " " << camera.getYAngle() << " "
+    // 	      << camera.getRadius() << std::endl; 
   }
 }
 
 void View::reshape(int width, int height) {
-  // Set our viewport to the size of our window  
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-  // Switch to the projection matrix so that we can manipulate how our scene is viewed  
   glMatrixMode(GL_PROJECTION);
-  // Reset the projection matrix to the identity matrix so that we don't get any artifacts (cleaning up)
   glLoadIdentity();
-  // Set the Field of view angle (in degrees), the aspect ratio of our window, and the new and far planes
-  gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
-  // Switch back to the model view matrix, so that we can start drawing shapes correctly 
+  gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 1000.0);
   glMatrixMode(GL_MODELVIEW);
 }//reshape
 
@@ -70,25 +67,39 @@ void View::specialKeyPressed (unsigned char key, int, int){
 
 
 void View::keysUpdate() {
+  if(keysPressed['j'])
+    camera.moveLeft();
+  
+  if(keysPressed['l'])
+    camera.moveRight();
+  
+  if(keysPressed['i'])
+    camera.moveUp();
+
+  if(keysPressed['k'])
+    camera.moveDown();
+  
+  if(keysPressed['='])
+    camera.zoomIn();
+
+  if(keysPressed['-'])
+      camera.zoomOut();
+
   if(keysPressed['a'])
-    yAngle = (yAngle-2);
-
+    model.leftKeyPressed();
+     
   if(keysPressed['d'])
-      yAngle = (yAngle+2);
-
-    if(keysPressed['w'])
-    zAngle = (zAngle-2);
-
-  if(keysPressed['s'])
-      zAngle = (zAngle+2);
+    model.rightKeyPressed();
 }
 
 
-void View::drawShip(const Ship &ship) {
+void View::drawShip(Ship &ship) {
+  
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glEnable(GL_COLOR_MATERIAL);
+
   //pass the vertex pointer:
   glVertexPointer( 3,   //3 components per vertex (x,y,z)
 		   GL_FLOAT,
@@ -97,20 +108,42 @@ void View::drawShip(const Ship &ship) {
   glNormalPointer( GL_FLOAT,
 		   0,
 		   PlayerShipNormals);
-  //pass the color pointer
+
+  if(ship.getType()==Ship::Type::PLAYER) {
+  
+  glColorPointer(  3,   //3 components per vertex (r,g,b)
+		   GL_FLOAT,
+		   0,
+		   PlayerShipColors);  //Pointer to the first color
+  } else if(ship.getType()==Ship::Type::ENEMY) {
+  
   glColorPointer(  3,   //3 components per vertex (r,g,b)
 		   GL_FLOAT,
 		   0,
 		   EnemyShipColors);  //Pointer to the first color
+  }
 
-  
+  glPushMatrix();
+  glTranslatef(xToViewX(ship.getX()), 0, yToViewZ(ship.getY()));
+  glRotatef(ship.getBank(),0,0,-1);
+  if(ship.getType()==Ship::Type::ENEMY) {
+      glTranslatef(0.0f, 0.0f, -11.0f);
+      glRotatef(180, 0.0f, 1.0f, 0.0f);
+  }
   glDrawElements(GL_TRIANGLES, PlayerShipIndNb*3, GL_UNSIGNED_BYTE, PlayerShipIndices);
-
+  glPopMatrix();
+  
   glDisable(GL_COLOR_MATERIAL);
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
   
+}
+
+void View::drawModel(){
+  drawShip(model.playerShip);
+  for (auto ship: model.enemyShips)
+    drawShip(ship);
 }
 
 GLfloat* View::getNormals(const GLfloat *vert, const GLubyte *ind, int v, int f) {
@@ -267,12 +300,12 @@ const GLfloat View::PlayerShipColors[] = {
   0,0,1,
   0,0,0.1,
   0,0,0.1,
-  0,0,1,
+  0.5,0.5,1,
 
   0,0,1,
   0,0,0.1,
   0,0,0.1,
-  0,0,1  
+  0.5,0.5,1  
 };
 
 const GLfloat View::EnemyShipColors[] = {
@@ -299,11 +332,13 @@ const GLfloat View::EnemyShipColors[] = {
   1,0,0,
   0.1,0,0,
   0.1,0,0,
-  1,0,0,
+  1,0.7,0,
 
   1,0,0,
   0.1,0,0,
   0.1,0,0,
-  1,0,0
+  1,0.7,0,
+
+
 };
 

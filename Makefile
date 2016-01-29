@@ -1,6 +1,6 @@
 CC = g++
 HEADERS = Model.h Ship.h Geometry.h View.h
-OBJS = main.o Model.o Geometry.o View.o
+OBJS = main.o Model.o Geometry.o View.o Ship.o
 FLAGS = -g -Wall -std=c++11 -lpthread -lglut -lGL -lGLU -lm
 
 TARGET = main.a
