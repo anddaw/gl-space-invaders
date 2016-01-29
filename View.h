@@ -15,7 +15,8 @@ private:
   float yAngle;
   float zAngle;
 
-
+  static const int PlayerShipVertNb;
+  static const int PlayerShipIndNb;
   static const GLfloat PlayerShipVertices[];
   static const GLubyte PlayerShipIndices[];
   GLfloat *PlayerShipNormals;
@@ -54,8 +55,8 @@ public:
 
     PlayerShipNormals = getNormals(PlayerShipVertices,
 					 PlayerShipIndices,
-					 8,
-					 8);
+					 PlayerShipVertNb,
+					 PlayerShipIndNb);
   }
   
 };
