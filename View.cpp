@@ -31,6 +31,14 @@ void View::display() {
   glutSwapBuffers();
 }//display
 
+void View::idle() {
+  if(timer.elapsed() > 1.0/FPS) {
+    timer.restart();
+    display();
+    keysUpdate();
+  }
+}
+
 void View::reshape(int width, int height) {
   // Set our viewport to the size of our window  
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
@@ -93,7 +101,7 @@ void View::drawShip(const Ship &ship) {
   glColorPointer(  3,   //3 components per vertex (r,g,b)
 		   GL_FLOAT,
 		   0,
-		   PlayerShipColors);  //Pointer to the first color
+		   EnemyShipColors);  //Pointer to the first color
 
   
   glDrawElements(GL_TRIANGLES, PlayerShipIndNb*3, GL_UNSIGNED_BYTE, PlayerShipIndices);
@@ -265,5 +273,37 @@ const GLfloat View::PlayerShipColors[] = {
   0,0,0.1,
   0,0,0.1,
   0,0,1  
+};
+
+const GLfloat View::EnemyShipColors[] = {
+  0.7, 0.3, 0.3,
+
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+  0.5,0.5,0.5,
+
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+  0.7,0.7,0.7,
+
+  1,0,0,
+  0.1,0,0,
+  0.1,0,0,
+  1,0,0,
+
+  1,0,0,
+  0.1,0,0,
+  0.1,0,0,
+  1,0,0
 };
 

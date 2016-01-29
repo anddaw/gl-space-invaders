@@ -12,6 +12,10 @@ void display (void) {
   view.display();
 }
 
+void idle (void) {
+  view.idle();
+}
+
 void reshape(int width, int height) {
   view.reshape(width,height);
 }
@@ -49,7 +53,7 @@ int main(int argc, char** argv) {
   glutKeyboardUpFunc(keyUp);
   glutDisplayFunc(display); 
   glutReshapeFunc(reshape); 
-  glutIdleFunc(glutPostRedisplay);//Zmienić!
+  glutIdleFunc(idle);
   
   glutMainLoop(); // Enter GLUT's main loop  
 

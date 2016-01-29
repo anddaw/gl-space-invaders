@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include "Model.h"
 #include <math.h>
+#include <boost/timer.hpp>
 
 class View {
 
@@ -20,12 +21,16 @@ private:
   static const GLfloat PlayerShipVertices[];
   static const GLubyte PlayerShipIndices[];
   GLfloat *PlayerShipNormals;
-  
   static const GLfloat PlayerShipColors[];
+  static const GLfloat EnemyShipColors[];
   
   
   //Rysuje statek
   void drawShip(const Ship &ship);
+
+  //timer
+  boost::timer timer;
+  static const int FPS = 60;
 
 
   
@@ -40,6 +45,8 @@ public:
   void display();
   //zmiana rozmiaru okna
   void reshape(int, int);
+
+  void idle();
 
   void keyPressed (unsigned char, int, int);
   void specialKeyPressed (unsigned char, int, int);
