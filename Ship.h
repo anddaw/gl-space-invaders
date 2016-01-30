@@ -2,11 +2,14 @@
 #define SHIP_H
 
 #include <iostream>
+#include "Geometry.h"
+#include "Missile.h"
+
 
 class Ship {
   
 public:
-  enum Type {PLAYER, ENEMY};
+  enum Type {PLAYER, ENEMY, DESTROYED};
 
 private:
   float x;
@@ -22,13 +25,8 @@ private:
   static const float forceCoef;
   static const float maxV;
   static const float maxBank;
-  static const float maxX;
-  static const float minX;
-  static const float maxY;
-  static const float minY;
 
   static const float step;
-  
 public:
 
   
@@ -51,12 +49,12 @@ public:
 
   void bankLeft() {
     bank-=step;
-    checkVal(bank,maxBank);
+    Borders::checkVal(bank,maxBank);
   }
 
   void bankRight(){
     bank+=step;
-    checkVal(bank,maxBank);
+    Borders::checkVal(bank,maxBank);
   }
 
   void noBank() {
@@ -66,14 +64,14 @@ public:
     else if(bank>0) bank-=step;
   }
 
+  void setV(float v) {this->v=v; Borders::checkVal(v,maxV);}
+
   void print() {std::cout << "v: " << v << "a: " << bank*forceCoef << "\n";}
 
   void update();
+
+  bool hit(Missile &m);
   
-  //Sprawdza czy wartosc nalezy do okreslonego przedzialu,
-  //jezeli nie, ustawia na wartosc minimalna lub maksymalna
-  static void checkVal(float &f, float min, float max);
-  static void checkVal(float &f, float absMax);
 };
 
 #endif

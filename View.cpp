@@ -23,6 +23,13 @@ void View::display() {
   // drawShip(ship2);
   // drawShip(ship3);
 
+  //  glPushMatrix();
+  //  glTranslatef(0,-1,-105);
+  // glScalef(15,0.01,21);
+  //glutSolidCube(10);
+  //glPopMatrix();
+
+
   drawModel();
   glPopMatrix();
   
@@ -90,10 +97,17 @@ void View::keysUpdate() {
      
   if(keysPressed['d'])
     model.rightKeyPressed();
+
+  if(keysPressed[' '])
+    model.fireKeyPressed();
+  else
+    model.fireKeyNotPressed();
+  
 }
 
 
 void View::drawShip(Ship &ship) {
+  if(ship.getType()==Ship::Type::DESTROYED) return;
   
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
@@ -140,10 +154,45 @@ void View::drawShip(Ship &ship) {
   
 }
 
+void View::drawMissile(Missile &missile) {
+  glPushMatrix();
+  //glScalef(10,10,10); //TEST
+
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
+
+  glVertexPointer(3,GL_FLOAT,0,missileVertices);
+  glNormalPointer(GL_FLOAT,0,missileNormals);
+
+  glTranslatef(xToViewX(missile.getX()), 0, yToViewZ(missile.getY()));
+  if(missile.getType()==Missile::Type::ENEMY) {
+      glTranslatef(0.0f, 0.0f, -5.0f);
+      glRotatef(180, 0.0f, 1.0f, 0.0f);
+      glMaterialfv(GL_FRONT,GL_EMISSION,enemyMissileEmission); 
+  } else if (missile.getType()==Missile::Type::PLAYER)
+    {
+      glMaterialfv(GL_FRONT,GL_EMISSION,playerMissileEmission); 
+    }
+
+  glDrawElements(GL_TRIANGLES, PlayerShipIndNb*3, GL_UNSIGNED_BYTE, missileIndices);
+  
+  
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glMaterialfv(GL_FRONT,GL_EMISSION,defaultEmission);
+  
+  glPopMatrix();
+	     
+
+}
+
 void View::drawModel(){
   drawShip(model.playerShip);
-  for (auto ship: model.enemyShips)
+  for (auto& ship: model.enemyShips)
     drawShip(ship);
+  for (auto& missile: model.missiles)
+    drawMissile(missile);
 }
 
 GLfloat* View::getNormals(const GLfloat *vert, const GLubyte *ind, int v, int f) {
@@ -341,4 +390,45 @@ const GLfloat View::EnemyShipColors[] = {
 
 
 };
+
+const GLfloat View::playerMissileEmission[] = {0,1,0,1};
+const GLfloat View::enemyMissileEmission[] = {1,0,0,1};
+const GLfloat View::defaultEmission[] = {0,0,0,1};
+
+const int View::missileVertNb = 12;
+
+const GLfloat View::missileVertices[] = {
+
+  -0.15,0.2,0,
+  0.15,0.2,0,
+  0.2,0,0,
+  0.15,-0.2,0,
+  -0.15,-0.2,0,
+  -0.2, 0, 0,
+
+  -0.15,0.2,5,
+  0.15,0.2,5,
+  0.2,0,5,
+  0.15,-0.2,5,
+  -0.15,-0.2,5,
+  -0.2, 0, 5
+
+};
+
+const int View::missileIndNb = 12;
+const GLubyte View::missileIndices[] = {
+  0,1,6,
+  1,6,7,
+  1,2,7,
+  2,7,8,
+  2,3,8,
+  3,8,9,
+  3,4,9,
+  4,9,10,
+  4,5,10,
+  5,10,11,
+  5,0,11,
+  0,11,6
+};
+
 

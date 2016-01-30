@@ -53,6 +53,15 @@ private:
   static const GLfloat PlayerShipColors[];
   static const GLfloat EnemyShipColors[];
 
+  static const int missileVertNb;
+  static const int missileIndNb;
+  static const GLfloat missileVertices[];
+  static const GLubyte missileIndices[];
+  GLfloat *missileNormals;
+  static const GLfloat playerMissileEmission[];
+  static const GLfloat enemyMissileEmission[];
+  static const GLfloat defaultEmission[];
+
   //Konwersja ze wspolrzednych modelu
   float xToViewX(float  x) {return 3.0*x;}
   float yToViewZ(float  y) {return -3.0*y;}
@@ -61,6 +70,9 @@ private:
   //Rysuje statek
   void drawShip(Ship &ship);
 
+  //Rysuje pocisk
+  void drawMissile(Missile &missile);
+  
   //Rysuje model
   void drawModel();
 
@@ -97,6 +109,10 @@ public:
 					 PlayerShipIndices,
 					 PlayerShipVertNb,
 					 PlayerShipIndNb);
+    missileNormals = getNormals(missileVertices,
+					 missileIndices,
+					 missileVertNb,
+					 missileIndNb);
   }
   
 };

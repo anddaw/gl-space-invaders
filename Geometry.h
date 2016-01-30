@@ -26,7 +26,22 @@ public:
     startX += x;
     startY += y;
   }
+
+
     
+};
+
+class Borders {
+public:
+  //Sprawdza czy wartosc nalezy do okreslonego przedzialu,
+  //jezeli nie, ustawia na wartosc minimalna lub maksymalna
+  static bool checkVal(float &f, float min, float max);
+  static bool checkVal(float &f, float absMax);
+
+  static const float maxX;
+  static const float minX;
+  static const float maxY;
+  static const float minY;
 };
 
 #endif
