@@ -102,6 +102,11 @@ void View::keysUpdate() {
     model.fireKeyPressed();
   else
     model.fireKeyNotPressed();
+
+  if(keysPressed['p'])
+    model.pauseKeyPressed();
+  else
+    model.pauseKeyNotPressed();
   
 }
 

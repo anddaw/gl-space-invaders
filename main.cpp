@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
   glutInitWindowPosition (100, 100); // Set the position of the window  
   glutCreateWindow ("GKOM - Space Invaders"); // Set the title for the window
 
+  glutFullScreen();
   init();
 
   //Obsluga klawiszy w XWindow

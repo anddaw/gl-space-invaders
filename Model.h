@@ -9,8 +9,13 @@
 
 class Model {
   enum EnemyState {MOVE_L,MOVE_R};
+  enum GameState {RUNNING,PAUSED,OVER};
+
+  GameState gameState;
   EnemyState enemyState;
   int enemyStateCounter;
+
+  void start();
   
 public:
   Ship playerShip;
@@ -21,20 +26,23 @@ public:
   bool rightKey;
 
   bool fired;
+  bool paused;
   
   void leftKeyPressed() {leftKey=true;}
   void rightKeyPressed() {rightKey=true;}
-  void fireKeyPressed() {if(!fired) {fire(playerShip); fired=true;};}
+  void fireKeyPressed();
   void fireKeyNotPressed() {fired=false;}
+  void pauseKeyPressed();
+  void pauseKeyNotPressed();
   void step();
 
   void fire(Ship &ship);
-  void fireRand(Ship &ship) {if(std::rand()%480==0) fire(ship);}
+  void fireRand(Ship &ship) {if(std::rand()%240==0) fire(ship);}
 
   void updateEnemy();
   void updateMissiles();
 
-  Model();
+  Model() {start();}
 };
 
 #endif

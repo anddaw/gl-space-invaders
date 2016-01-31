@@ -2,8 +2,8 @@
 #include "Model.h"
 
 
-Model::Model() {
-
+void Model::start() {
+  gameState=RUNNING;
   playerShip = Ship(0,0,Ship::Type::PLAYER);
   
   //ustawianie statków przeciwnika
@@ -15,10 +15,15 @@ Model::Model() {
   //stan przeciwnika
   enemyState=MOVE_L;
   enemyStateCounter=0;
+
+  missiles.clear();
 }
 
 void Model::step() {
 
+  //gra nie dziala nic nie rob
+  if(gameState!=RUNNING) return;
+  
   if((leftKey && rightKey) || (!leftKey&&!rightKey))
     playerShip.noBank();
   else if(leftKey)
@@ -28,8 +33,16 @@ void Model::step() {
   leftKey=rightKey=false;
 
   playerShip.update();
+  
+  //trafienia
+  for(auto& ship:enemyShips)
+    if(ship.getType()!=Ship::Type::DESTROYED)
+      for(auto& missile:missiles)
+	ship.hit(missile);
 
-
+  for(auto& missile:missiles)
+    if(playerShip.hit(missile)) gameState=OVER;
+       
   //Przeciwnik
   updateEnemy();
   //Pociski
@@ -84,20 +97,42 @@ void Model::updateEnemy() {
 void Model::updateMissiles() {
   for(auto& missile:missiles)
     missile.update();
-  
-  std::cout << missiles.size() << "\n";
   missiles.remove_if([](Missile &m) {return m.getType()==Missile::Type::VOID;});
-  
-
 }
 
 
 void Model::fire(Ship &ship) {
   Missile::Type t;
+  float adj;
+  
+  if (ship.getType() == Ship::Type::PLAYER) {t=Missile::Type::PLAYER; adj=3;}
+  if (ship.getType() == Ship::Type::ENEMY) {t=Missile::Type::ENEMY; adj=-3;}
 
-  if (ship.getType() == Ship::Type::PLAYER) t=Missile::Type::PLAYER;
-  if (ship.getType() == Ship::Type::ENEMY) t=Missile::Type::ENEMY;
-
-  missiles.push_back(Missile(ship.getX(),ship.getY(),t));
+  missiles.push_back(Missile(ship.getX(),ship.getY()+adj,t));
 
 }
+
+
+void Model::fireKeyPressed() {
+    if(gameState==OVER) {
+      start();
+    } else if(!fired) {
+      fire(playerShip); fired=true;
+    }
+}
+
+void Model::pauseKeyPressed() {
+  if(!paused) {
+    std::cout << "paused\n";
+    paused=true;
+    if(gameState==RUNNING)
+      gameState=PAUSED;
+    else if(gameState==PAUSED)
+      gameState=RUNNING;
+  }
+}
+void Model::pauseKeyNotPressed() {
+  paused=false;
+}
+
+
